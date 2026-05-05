@@ -4,7 +4,7 @@ import { useState } from "react";
 import ChatPanel from "./ChatPanel";
 import { GotchaBar, RevealPanel } from "./Feedback";
 import { ChatMessage, SYSTEM_A, SYSTEM_B, ROUND_CHIPS, Message } from "../lib/constants";
-import { callClaude, uid } from "../lib/api";
+import { callOpenAI, uid } from "../lib/api";
 
 export default function Round2() {
   const [msgsA, setMsgsA] = useState<ChatMessage[]>([]);
@@ -41,9 +41,9 @@ export default function Round2() {
     const newHistB: Message[] = [...historyB(), { role: "user", content: text }];
 
     const [resA, resB] = await Promise.all([
-      callClaude(SYSTEM_A, newHistA).catch((e) => `[Error: ${e.message}]`),
-      callClaude(SYSTEM_B, newHistB).catch((e) => `[Error: ${e.message}]`),
-    ]);
+    callOpenAI(SYSTEM_A, newHistA).catch((e) => `[Error: ${e.message}]`),
+    callOpenAI(SYSTEM_B, newHistB).catch((e) => `[Error: ${e.message}]`),
+]);
 
     setMsgsA((prev) => [
       ...prev.filter((m) => m.id !== thinkA.id),

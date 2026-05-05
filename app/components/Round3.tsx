@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { GotchaBar, RevealPanel } from "./Feedback";
 import { SYSTEM_B, COLLAPSE_PROMPT } from "../lib/constants";
-import { callClaude, computeSimilarity, uid } from "../lib/api";
+import { callOpenAI, computeSimilarity, uid } from "../lib/api";
 
 interface CollapseCard {
   id: string;
@@ -46,7 +46,7 @@ export default function Round3() {
     setCards(newCards);
 
     const calls = Array.from({ length: 5 }, () =>
-      callClaude(SYSTEM_B, [{ role: "user", content: COLLAPSE_PROMPT }]).catch(
+      callOpenAI(SYSTEM_B, [{ role: "user", content: COLLAPSE_PROMPT }]).catch(
         (e) => `[Error: ${e.message}]`
       )
     );
