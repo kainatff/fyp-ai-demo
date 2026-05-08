@@ -7,9 +7,21 @@ interface ChatPanelProps {
   panel: "a" | "b";
   messages: ChatMessage[];
   disabled: boolean;
+
+  // Optional props for panels with input support
+  inputValue?: string;
+  onInputChange?: React.Dispatch<React.SetStateAction<string>>;
+  onSend?: () => Promise<void>;
 }
 
-export default function ChatPanel({ panel, messages, disabled }: ChatPanelProps) {
+export default function ChatPanel({
+  panel,
+  messages,
+  inputValue,
+  onInputChange,
+  onSend,
+  disabled,
+}: ChatPanelProps) {
   const msgsRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -51,6 +63,7 @@ export default function ChatPanel({ panel, messages, disabled }: ChatPanelProps)
             flexShrink: 0,
           }}
         />
+
         <span
           style={{
             fontSize: 11,
@@ -63,6 +76,7 @@ export default function ChatPanel({ panel, messages, disabled }: ChatPanelProps)
         >
           AI Assistant {isA ? "A" : "B"}
         </span>
+
         <span
           style={{
             fontSize: 10,
@@ -106,6 +120,7 @@ export default function ChatPanel({ panel, messages, disabled }: ChatPanelProps)
             Select a prompt below to fire both panels.
           </span>
         )}
+
         {messages.map((msg) => {
           if (msg.isThinking) {
             return (
@@ -124,7 +139,9 @@ export default function ChatPanel({ panel, messages, disabled }: ChatPanelProps)
               </div>
             );
           }
+
           const isUser = msg.role === "user";
+
           return (
             <div
               key={msg.id}
@@ -160,6 +177,61 @@ export default function ChatPanel({ panel, messages, disabled }: ChatPanelProps)
           );
         })}
       </div>
+
+      {/* Optional Input Area */}
+      {inputValue !== undefined &&
+        onInputChange &&
+        onSend && (
+          <div
+            style={{
+              borderTop: "0.5px solid var(--border)",
+              padding: 12,
+              display: "flex",
+              gap: 8,
+              background: "var(--surface)",
+            }}
+          >
+            <input
+              type="text"
+              value={inputValue}
+              onChange={(e) => onInputChange(e.target.value)}
+              placeholder="Type a message..."
+              disabled={disabled}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && !disabled) {
+                  onSend();
+                }
+              }}
+              style={{
+                flex: 1,
+                padding: "10px 12px",
+                borderRadius: 8,
+                border: "0.5px solid var(--border)",
+                background: "var(--surface2)",
+                color: "var(--text)",
+                fontSize: 12.5,
+                outline: "none",
+              }}
+            />
+
+            <button
+              onClick={onSend}
+              disabled={disabled}
+              style={{
+                padding: "10px 14px",
+                borderRadius: 8,
+                border: "none",
+                cursor: disabled ? "not-allowed" : "pointer",
+                background: isA ? "var(--green)" : "var(--red)",
+                color: "white",
+                fontWeight: 600,
+                opacity: disabled ? 0.6 : 1,
+              }}
+            >
+              Send
+            </button>
+          </div>
+        )}
     </div>
   );
 }
