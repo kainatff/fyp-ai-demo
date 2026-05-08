@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { GotchaBar, RevealPanel } from "./Feedback";
-import { SYSTEM_B, COLLAPSE_PROMPT } from "../lib/constants";
+import { SYSTEM_B, COLLAPSE_PROMPTS } from "../lib/constants";
 import { callOpenAI, computeSimilarity, uid } from "../lib/api";
 
 interface CollapseCard {
@@ -15,6 +15,7 @@ export default function Round3() {
   const [cards, setCards] = useState<CollapseCard[]>(
     Array.from({ length: 5 }, () => ({ id: uid(), text: "Waiting...", loaded: false }))
   );
+  const [activePrompt, setActivePrompt] = useState(COLLAPSE_PROMPTS[0]);
   const [running, setRunning] = useState(false);
   const [similarity, setSimilarity] = useState<number | null>(null);
   const [triggered, setTriggered] = useState(false);
@@ -46,10 +47,10 @@ export default function Round3() {
     setCards(newCards);
 
     const calls = Array.from({ length: 5 }, () =>
-      callOpenAI(SYSTEM_B, [{ role: "user", content: COLLAPSE_PROMPT }]).catch(
-        (e) => `[Error: ${e.message}]`
-      )
-    );
+  callOpenAI(SYSTEM_B, [
+    { role: "user", content: activePrompt.text },
+  ]).catch((e) => `[Error: ${e.message}]`)
+);
 
     const results = await Promise.all(calls);
 
@@ -85,11 +86,39 @@ export default function Round3() {
       </div>
 
       {/* Prompt preview */}
-      <div style={{ margin: "20px 28px 0", padding: "12px 16px", border: "0.5px solid var(--border)", borderRadius: 8, background: "var(--surface)", fontSize: 12, color: "var(--text2)", lineHeight: 1.6 }}>
-        <span style={{ color: "var(--text4)", marginRight: 8, letterSpacing: "0.08em", fontSize: 10, textTransform: "uppercase" }}>prompt →</span>
-        {COLLAPSE_PROMPT}
-      </div>
+ {/* Prompt Pills Selector */}
+<div style={{ padding: "20px 28px 0" }}>
+  <div style={{ fontSize: 10, color: "var(--text4)", marginBottom: 6 }}>
+    Select prompt →
+  </div>
 
+  <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+    {COLLAPSE_PROMPTS.map((p) => (
+      <button
+        key={p.label}
+        onClick={() => setActivePrompt(p)}
+        disabled={running}
+        style={{
+          padding: "6px 12px",
+          borderRadius: 20,
+          fontSize: 12,
+          border: "0.5px solid var(--chip-border)",
+          background:
+            activePrompt.label === p.label
+              ? "var(--accent)"
+              : "var(--chip-bg)",
+          color:
+            activePrompt.label === p.label ? "#fff" : "var(--chip-text)",
+          cursor: running ? "default" : "pointer",
+          opacity: running ? 0.5 : 1,
+          fontFamily: "'DM Mono', monospace",
+        }}
+      >
+        {p.label}
+      </button>
+    ))}
+  </div>
+</div>
       <button
         onClick={fireCollapse}
         disabled={running}
@@ -124,7 +153,33 @@ export default function Round3() {
       >
         {running ? "⟳  Firing 5 simultaneous calls..." : "→  Fire all 5 calls at once"}
       </button>
+{/* Prompt Display Box */}
+<div
+  style={{
+    margin: "16px 28px 0",
+    padding: "12px 16px",
+    border: "0.5px solid var(--border)",
+    borderRadius: 8,
+    background: "var(--surface)",
+    fontSize: 12,
+    color: "var(--text2)",
+    lineHeight: 1.6,
+  }}
+>
+  <span
+    style={{
+      color: "var(--text4)",
+      marginRight: 8,
+      fontSize: 10,
+      textTransform: "uppercase",
+      letterSpacing: "0.08em",
+    }}
+  >
+    prompt →
+  </span>
 
+  {activePrompt.text}
+</div>
       {/* Cards grid */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 8, padding: "0 28px" }}>
         {cards.map((card, i) => (
