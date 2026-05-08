@@ -5,7 +5,7 @@ import ChatPanel from "./ChatPanel";
 import { GotchaBar, RevealPanel } from "./Feedback";
 import { ChatMessage, SYSTEM_A, SYSTEM_B, ROUND_CHIPS, Message } from "../lib/constants";
 import { callOpenAI, uid } from "../lib/api";
-
+import { SYSTEM_B_ROUND2 } from "../lib/constants";
 export default function Round2() {
   const [msgsA, setMsgsA] = useState<ChatMessage[]>([]);
   const [msgsB, setMsgsB] = useState<ChatMessage[]>([]);
@@ -42,7 +42,7 @@ export default function Round2() {
 
     const [resA, resB] = await Promise.all([
     callOpenAI(SYSTEM_A, newHistA).catch((e) => `[Error: ${e.message}]`),
-    callOpenAI(SYSTEM_B, newHistB).catch((e) => `[Error: ${e.message}]`),
+    callOpenAI(SYSTEM_B_ROUND2, newHistB).catch((e) => `[Error: ${e.message}]`),
 ]);
 
     setMsgsA((prev) => [

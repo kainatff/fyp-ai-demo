@@ -6,20 +6,10 @@ import { ChatMessage } from "../lib/constants";
 interface ChatPanelProps {
   panel: "a" | "b";
   messages: ChatMessage[];
-  inputValue: string;
-  onInputChange: (v: string) => void;
-  onSend: () => void;
   disabled: boolean;
 }
 
-export default function ChatPanel({
-  panel,
-  messages,
-  inputValue,
-  onInputChange,
-  onSend,
-  disabled,
-}: ChatPanelProps) {
+export default function ChatPanel({ panel, messages, disabled }: ChatPanelProps) {
   const msgsRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -95,7 +85,7 @@ export default function ChatPanel({
           flexDirection: "column",
           gap: 8,
           minHeight: 280,
-          maxHeight: 360,
+          maxHeight: 400,
           overflowY: "auto",
           background: "var(--surface2)",
         }}
@@ -113,7 +103,7 @@ export default function ChatPanel({
           >
             No messages yet.
             <br />
-            Use the prompts below or type your own.
+            Select a prompt below to fire both panels.
           </span>
         )}
         {messages.map((msg) => {
@@ -169,58 +159,6 @@ export default function ChatPanel({
             </div>
           );
         })}
-      </div>
-
-      {/* Input */}
-      <div
-        style={{
-          display: "flex",
-          borderTop: "0.5px solid var(--border)",
-          background: "var(--surface)",
-        }}
-      >
-        <input
-          value={inputValue}
-          onChange={(e) => onInputChange(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && !disabled && onSend()}
-          placeholder="Type a message..."
-          disabled={disabled}
-          style={{
-            flex: 1,
-            background: "transparent",
-            border: "none",
-            outline: "none",
-            padding: "12px 14px",
-            fontSize: 12.5,
-            color: "var(--text)",
-            fontFamily: "'DM Mono', monospace",
-            opacity: disabled ? 0.5 : 1,
-          }}
-        />
-        <button
-          onClick={onSend}
-          disabled={disabled}
-          style={{
-            padding: "0 16px",
-            background: "transparent",
-            border: "none",
-            cursor: disabled ? "default" : "pointer",
-            color: disabled ? "var(--text4)" : "var(--accent-dim)",
-            fontSize: 16,
-            transition: "color 0.15s",
-            fontFamily: "inherit",
-          }}
-          onMouseEnter={(e) => {
-            if (!disabled)
-              (e.target as HTMLElement).style.color = "var(--accent)";
-          }}
-          onMouseLeave={(e) => {
-            if (!disabled)
-              (e.target as HTMLElement).style.color = "var(--accent-dim)";
-          }}
-        >
-          ↑
-        </button>
       </div>
     </div>
   );
